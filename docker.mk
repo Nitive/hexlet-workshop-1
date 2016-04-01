@@ -12,6 +12,13 @@ else
 	docker exec -it $(CONTAINER_ID) /bin/bash -c 'sudo -E PATH=$$PATH HOME=$(HOME) -u nobody make test -C /usr/src/app'
 endif
 
+tdd:
+ifeq ([], $(shell docker inspect $(CONTAINER_ID) 2> /dev/null))
+	@ echo "Please, run 'make start' before 'make tdd'" >&2; exit 1;
+else
+	docker exec -it $(CONTAINER_ID) /bin/bash -c 'sudo -E PATH=$$PATH HOME=$(HOME) -u nobody make tdd -C /usr/src/app'
+endif
+
 prepare:
 ifeq ([], $(shell docker inspect $(CONTAINER_ID) 2> /dev/null))
 	@ echo "Please, run 'make start' before 'make test'" >&2; exit 1;
@@ -62,7 +69,7 @@ else
 	docker exec $(CONTAINER_ID) make test -C /exercise_internal
 endif
 
-all: build start test
+all: build start test tdd
 
 macos:
 	eval "$(docker-machine env default)"
